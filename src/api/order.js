@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function fetchList(params) {
+export function fetchList(storeId, params) {
   return request({
-    url: '/order/list',
+    url: `/order/store?storeId=${storeId}`,
     method: 'get',
     params: params
   })

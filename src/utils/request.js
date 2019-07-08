@@ -3,10 +3,12 @@ import {Message, MessageBox} from 'element-ui'
 import store from '../store'
 import {getToken} from '@/utils/auth'
 
+export const serverUrl = 'http://172.27.128.110:8080'
+
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000 // 请求超时时间
+  baseURL: serverUrl /*process.env.BASE_API*/, // api的base_url
+  timeout: 10000 // 请求超时时间
 })
 
 // request拦截器

@@ -13,9 +13,12 @@ import store from './store'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import request from '@/utils/request'
 
 Vue.use(ElementUI, {locale})
 Vue.use(VCharts)
+
+Vue.$Request = request
 
 Vue.config.productionTip = false
 

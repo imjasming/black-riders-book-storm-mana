@@ -9,7 +9,7 @@
         <div style="text-align: center">
           <svg-icon icon-class="login-mall" style="width: 56px;height: 56px;color: #409EFF"></svg-icon>
         </div>
-        <h2 class="login-title color-main">mall-admin-web</h2>
+        <h2 class="login-title color-main">Book Storm Management</h2>
         <el-form-item prop="username">
           <el-input name="username"
                     type="text"
@@ -44,22 +44,12 @@
       </el-form>
     </el-card>
     <img :src="login_center_bg" class="login-center-layout">
-    <el-dialog
-      title="特别赞助"
-      :visible.sync="dialogVisible"
-      width="30%">
-      <span>mall项目已由CODING特别赞助，点击去支持，页面加载完后点击<span class="color-main font-medium">免费体验</span>按钮即可完成支持，谢谢！</span>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogCancel">残忍拒绝</el-button>
-    <el-button type="primary" @click="dialogConfirm">去支持</el-button>
-  </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
   import {isvalidUsername} from '@/utils/validate';
-  import {getSupport, setSupport, SupportUrl} from '@/utils/support';
+  import {setSupport, SupportUrl} from '@/utils/support';
   import login_center_bg from '@/assets/images/login_center_bg.png'
 
   export default {
@@ -73,15 +63,15 @@
         }
       };
       const validatePass = (rule, value, callback) => {
-        if (value.length < 3) {
-          callback(new Error('密码不能小于3位'))
+        if (value.length < 6) {
+          callback(new Error('密码不能小于6位'))
         } else {
           callback()
         }
       };
       return {
         loginForm: {
-          username: 'admin',
+          username: '123456',
           password: '123456',
         },
         loginRules: {
@@ -105,17 +95,16 @@
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
-            let isSupport = getSupport();
-            if (isSupport === undefined || isSupport == null) {
-              this.dialogVisible = true;
-              return;
-            }
             this.loading = true;
             this.$store.dispatch('Login', this.loginForm).then(() => {
               this.loading = false;
               this.$router.push({path: '/'})
-            }).catch(() => {
+            }).catch(error => {
               this.loading = false
+              this.$message({
+                message: error.response.error,
+                type: 'error'
+              })
             })
           } else {
             console.log('参数验证不合法！');

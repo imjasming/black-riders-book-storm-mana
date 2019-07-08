@@ -1,6 +1,6 @@
 <template> 
   <div class="app-container">
-    <el-card class="filter-container" shadow="never">
+    <!--<el-card class="filter-container" shadow="never">
       <div>
         <i class="el-icon-search"></i>
         <span>筛选搜索</span>
@@ -64,7 +64,7 @@
           </el-form-item>
         </el-form>
       </div>
-    </el-card>
+    </el-card>-->
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
       <span>数据列表</span>
@@ -80,22 +80,16 @@
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="订单编号" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
+          <template slot-scope="scope">{{scope.row.orderNumber}}</template>
         </el-table-column>
         <el-table-column label="提交时间" width="180" align="center">
           <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
-        <el-table-column label="用户账号" align="center">
-          <template slot-scope="scope">{{scope.row.memberUsername}}</template>
+        <el-table-column label="收货人" align="center">
+          <template slot-scope="scope">{{scope.row.receiverName}}</template>
         </el-table-column>
         <el-table-column label="订单金额" width="120" align="center">
-          <template slot-scope="scope">￥{{scope.row.totalAmount}}</template>
-        </el-table-column>
-        <el-table-column label="支付方式" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.payType | formatPayType}}</template>
-        </el-table-column>
-        <el-table-column label="订单来源" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.sourceType | formatSourceType}}</template>
+          <template slot-scope="scope">￥{{scope.row.totalPrice}}</template>
         </el-table-column>
         <el-table-column label="订单状态" width="120" align="center">
           <template slot-scope="scope">{{scope.row.status | formatStatus}}</template>
@@ -187,6 +181,7 @@
   import {closeOrder, deleteOrder, fetchList} from '@/api/order'
   import {formatDate} from '@/utils/date';
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
+  import request from '@/utils/request'
 
   const defaultListQuery = {
     pageNum: 1,
@@ -274,7 +269,7 @@
       }
     },
     created() {
-      this.getList();
+      this.initStoreInfo()
     },
     filters: {
       formatCreateTime(time) {
@@ -314,35 +309,54 @@
       },
     },
     methods: {
+      initStoreInfo() {
+        request.get(`/store/info?username=${this.$store.getters.name}`).then(response => {
+          this.$store.dispatch('loadStoreInfo', this.$store.getters.name)
+          this.getList(response.data.id);
+        }).catch(error => {
+          this.$message({
+            message: error,
+            type: 'error'
+          })
+        })
+      },
       handleResetSearch() {
         this.listQuery = Object.assign({}, defaultListQuery);
-      },
+      }
+      ,
       handleSearchList() {
         this.listQuery.pageNum = 1;
         this.getList();
-      },
+      }
+      ,
       handleSelectionChange(val) {
         this.multipleSelection = val;
-      },
+      }
+      ,
       handleViewOrder(index, row) {
         this.$router.push({path: '/oms/orderDetail', query: {id: row.id}})
-      },
+      }
+      ,
       handleCloseOrder(index, row) {
         this.closeOrder.dialogVisible = true;
         this.closeOrder.orderIds = [row.id];
-      },
+      }
+      ,
       handleDeliveryOrder(index, row) {
         let listItem = this.covertOrder(row);
         this.$router.push({path: '/oms/deliverOrderList', query: {list: [listItem]}})
-      },
+      }
+      ,
       handleViewLogistics(index, row) {
         this.logisticsDialogVisible = true;
-      },
+      }
+      ,
       handleDeleteOrder(index, row) {
         let ids = [];
         ids.push(row.id);
         this.deleteOrder(ids);
-      },
+      }
+      ,
       handleBatchOperate() {
         if (this.multipleSelection == null || this.multipleSelection.length < 1) {
           this.$message({
@@ -384,16 +398,19 @@
           }
           this.deleteOrder(ids);
         }
-      },
+      }
+      ,
       handleSizeChange(val) {
         this.listQuery.pageNum = 1;
         this.listQuery.pageSize = val;
         this.getList();
-      },
+      }
+      ,
       handleCurrentChange(val) {
         this.listQuery.pageNum = val;
         this.getList();
-      },
+      }
+      ,
       handleCloseOrderConfirm() {
         if (this.closeOrder.content == null || this.closeOrder.content === '') {
           this.$message({
@@ -416,15 +433,23 @@
             duration: 1000
           });
         });
-      },
-      getList() {
+      }
+      ,
+      getList(id) {
         this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
+        let storeId
+        if (id) {
+          storeId = id
+        } else if (this.$store.getters.storeInfo) {
+          storeId = this.$store.getters.storeInfo.id
+        }
+        fetchList(storeId, this.listQuery).then(response => {
           this.list = response.data.list;
           this.total = response.data.total;
+          this.listLoading = false;
         });
-      },
+      }
+      ,
       deleteOrder(ids) {
         this.$confirm('是否要进行该删除操作?', '提示', {
           confirmButtonText: '确定',
@@ -442,7 +467,8 @@
             this.getList();
           });
         })
-      },
+      }
+      ,
       covertOrder(order) {
         let address = order.receiverProvince + order.receiverCity + order.receiverRegion + order.receiverDetailAddress;
         let listItem = {
