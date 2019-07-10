@@ -9,16 +9,16 @@
                 style="width: 100%;"
                 :data="list" border>
         <el-table-column label="订单编号" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
+          <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="收货人" width="180" align="center">
           <template slot-scope="scope">{{scope.row.receiverName}}</template>
         </el-table-column>
         <el-table-column label="手机号码" width="160" align="center">
-          <template slot-scope="scope">{{scope.row.receiverPhone}}</template>
+          <template slot-scope="scope">{{scope.row.phone}}</template>
         </el-table-column>
         <el-table-column label="邮政编码" width="160" align="center">
-          <template slot-scope="scope">{{scope.row.receiverPostCode}}</template>
+          <template slot-scope="scope">{{scope.row.zipCode}}</template>
         </el-table-column>
         <el-table-column label="收货地址" align="center">
           <template slot-scope="scope">{{scope.row.address}}</template>
@@ -62,9 +62,14 @@
       }
     },
     created() {
-      this.list = this.$route.query.list;
+      this.initData()
     },
     methods: {
+      initData() {
+        let l = this.$store.getters.deliveryOrder
+        this.list = l
+        console.log(this.list)
+      },
       cancel() {
         this.$router.back();
       },
@@ -74,14 +79,20 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deliveryOrder(this.list).then(response => {
+          let list = {
+            storeId: this.$store.getters.storeInfo.id,
+            orderId: this.list[0].orderId,
+            shippingName: this.list[0].deliveryCompany,
+            shippingCode: this.list[0].deliverySn,
+          }
+          deliveryOrder(list).then(response => {
             this.$router.back();
             this.$message({
               type: 'success',
               message: '发货成功!'
             });
           });
-        }).catch(() => {
+        }).catch(error => {
           this.$message({
             type: 'info',
             message: '已取消发货'

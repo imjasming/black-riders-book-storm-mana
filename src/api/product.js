@@ -50,7 +50,7 @@ export function updatePublishStatus(params) {
 
 export function createProduct(data) {
   return request({
-    url: '/product/create',
+    url: '/book',
     method: 'post',
     data: data
   })

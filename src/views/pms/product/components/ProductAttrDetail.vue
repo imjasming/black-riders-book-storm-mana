@@ -132,7 +132,7 @@
       <el-form-item label="规格参数：">
         <el-tabs v-model="activeHtmlName" type="card">
           <el-tab-pane label="电脑端详情" name="pc">
-            <tinymce :width="595" :height="300" v-model="value.detailHtml"></tinymce>
+            <!--<tinymce :width="595" :height="300" v-model="value.detailHtml"></tinymce>-->
           </el-tab-pane>
           <el-tab-pane label="移动端详情" name="mobile">
             <tinymce :width="595" :height="300" v-model="value.detailMobileHtml"></tinymce>
@@ -152,11 +152,11 @@
   import {fetchList as fetchProductAttrList} from '@/api/productAttr'
   import SingleUpload from '@/components/Upload/singleUpload'
   import MultiUpload from '@/components/Upload/multiUpload'
-  import Tinymce from '@/components/Tinymce'
+  //import Tinymce from '@/components/Tinymce'
 
   export default {
     name: "ProductAttrDetail",
-    components: {SingleUpload, MultiUpload, Tinymce},
+    components: {SingleUpload, MultiUpload},
     props: {
       value: Object,
       isEdit: {

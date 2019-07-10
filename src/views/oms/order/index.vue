@@ -74,7 +74,7 @@
                 :data="list"
                 style="width: 100%;"
                 @selection-change="handleSelectionChange"
-                v-loading="listLoading" border>
+                border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
         <el-table-column label="编号" width="80" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
@@ -182,6 +182,7 @@
   import {formatDate} from '@/utils/date';
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
   import request from '@/utils/request'
+  import {Message} from "element-ui";
 
   const defaultListQuery = {
     pageNum: 1,
@@ -271,6 +272,12 @@
     created() {
       this.initStoreInfo()
     },
+    mounted() {
+      this.intervalLoadOrder()
+    },
+    destroyed() {
+      clearTimeout(this.intervalLoadOrder)
+    },
     filters: {
       formatCreateTime(time) {
         let date = new Date(time);
@@ -309,6 +316,10 @@
       },
     },
     methods: {
+      intervalLoadOrder() {
+        this.getList()
+        setTimeout(this.intervalLoadOrder, 1000)
+      },
       initStoreInfo() {
         request.get(`/store/info?username=${this.$store.getters.name}`).then(response => {
           this.$store.dispatch('loadStoreInfo', this.$store.getters.name)
@@ -344,6 +355,7 @@
       ,
       handleDeliveryOrder(index, row) {
         let listItem = this.covertOrder(row);
+        this.$store.dispatch('setdeliveryOrder', [row])
         this.$router.push({path: '/oms/deliverOrderList', query: {list: [listItem]}})
       }
       ,
@@ -447,6 +459,9 @@
           this.list = response.data.list;
           this.total = response.data.total;
           this.listLoading = false;
+          this.$store.dispatch('setOrders', this.list)
+        }).catch(error => {
+          Message.error(`数据加载失败：${error.error}`)
         });
       }
       ,
@@ -470,16 +485,12 @@
       }
       ,
       covertOrder(order) {
-        let address = order.receiverProvince + order.receiverCity + order.receiverRegion + order.receiverDetailAddress;
+        let address = order.address
         let listItem = {
           orderId: order.id,
-          orderSn: order.orderSn,
-          receiverName: order.receiverName,
-          receiverPhone: order.receiverPhone,
-          receiverPostCode: order.receiverPostCode,
-          address: address,
-          deliveryCompany: null,
-          deliverySn: null
+          storeId: this.$store.getters.storeInfo.id,
+          shoppingName: null,
+          shoppingCode: null
         };
         return listItem;
       }

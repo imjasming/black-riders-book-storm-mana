@@ -20,7 +20,7 @@ export function getInfo(username) {
 
 export function logout() {
   return request({
-    url: '/admin/logout',
+    url: '/user/logout',
     method: 'post'
   })
 }

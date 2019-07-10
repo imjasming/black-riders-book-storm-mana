@@ -26,8 +26,8 @@ export function deleteOrder(params) {
 
 export function deliveryOrder(data) {
   return request({
-    url: '/order/update/delivery',
-    method: 'post',
+    url: '/order/delivery',
+    method: 'put',
     data: data
   });
 }

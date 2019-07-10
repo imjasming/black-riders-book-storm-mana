@@ -1,62 +1,58 @@
 <template>
   <div style="margin-top: 50px">
     <el-form :model="value" :rules="rules" ref="productInfoForm" label-width="120px" style="width: 600px" size="small">
-      <el-form-item label="商品分类：" prop="productCategoryId">
+      <el-form-item label="商品分类：" prop="bookCategoryId">
         <el-cascader
           v-model="selectProductCateValue"
           :options="productCateOptions">
         </el-cascader>
       </el-form-item>
-      <el-form-item label="商品名称：" prop="name">
+
+      <el-form-item label="图书名称：" prop="name">
         <el-input v-model="value.name"></el-input>
       </el-form-item>
-      <el-form-item label="副标题：" prop="subTitle">
-        <el-input v-model="value.subTitle"></el-input>
+      <el-form-item label="图书概述：" prop="outline">
+        <el-input v-model="value.outline"></el-input>
       </el-form-item>
-      <el-form-item label="商品品牌：" prop="brandId">
-        <el-select
-          v-model="value.brandId"
-          @change="handleBrandChange"
-          placeholder="请选择品牌">
-          <el-option
-            v-for="item in brandOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="商品介绍：">
+      <el-form-item label="图书详情：">
         <el-input
           :autoSize="true"
-          v-model="value.description"
+          v-model="value.detail"
           type="textarea"
           placeholder="请输入内容"></el-input>
       </el-form-item>
-      <el-form-item label="商品货号：">
-        <el-input v-model="value.productSn"></el-input>
+      <el-form-item label="出版社：" prop="press">
+        <el-input
+          v-model="value.press">
+        </el-input>
       </el-form-item>
-      <el-form-item label="商品售价：">
+      <el-form-item label="作者：">
+        <el-input v-model="value.author"></el-input>
+      </el-form-item>
+      <el-form-item label="出版日期">
+        <el-input v-model="value.publishDate"></el-input>
+      </el-form-item>
+      <el-form-item label="图书大小：">
+        <el-input v-model="value.size" style="width: 300px"></el-input>
+      </el-form-item>
+      <el-form-item label="版本号：">
+        <el-input v-model="value.version"></el-input>
+      </el-form-item>
+      <el-form-item label="Isbn号：">
+        <el-input v-model="value.isbn"></el-input>
+      </el-form-item>
+      <el-form-item label="价格：">
         <el-input v-model="value.price"></el-input>
       </el-form-item>
       <el-form-item label="市场价：">
-        <el-input v-model="value.originalPrice"></el-input>
+        <el-input v-model="value.marketPrice"></el-input>
       </el-form-item>
-      <el-form-item label="商品库存：">
-        <el-input v-model="value.stock"></el-input>
+      <el-form-item label="库存：">
+        <el-input v-model="value.storeMount"></el-input>
       </el-form-item>
-      <el-form-item label="计量单位：">
-        <el-input v-model="value.unit"></el-input>
-      </el-form-item>
-      <el-form-item label="商品重量：">
-        <el-input v-model="value.weight" style="width: 300px"></el-input>
-        <span style="margin-left: 20px">克</span>
-      </el-form-item>
-      <el-form-item label="排序">
-        <el-input v-model="value.sort"></el-input>
-      </el-form-item>
+      <!---------------------------------------------------------->
       <el-form-item style="text-align: center">
-        <el-button type="primary" size="medium" @click="handleNext('productInfoForm')">下一步，填写商品促销</el-button>
+        <el-button type="primary" size="medium" @click="handleCommit('productInfoForm')">提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -87,17 +83,17 @@
             {required: true, message: '请输入商品名称', trigger: 'blur'},
             {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
           ],
-          subTitle: [{required: true, message: '请输入商品副标题', trigger: 'blur'}],
-          productCategoryId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
-          brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
-          description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],
+          outline: [{required: true, message: '请输入图书概述', trigger: 'blur'}],
+          bookCategoryId: [{required: false, message: '请选择分类', trigger: 'blur'}],
+          author: [{required: true, message: '请选择图书作者', trigger: 'blur'}],
+          detail: [{required: true, message: '请输入图书详情', trigger: 'blur'}],
           requiredProp: [{required: true, message: '该项为必填项', trigger: 'blur'}]
         }
       };
     },
     created() {
       this.getProductCateList();
-      this.getBrandList();
+      //this.getBrandList();
     },
     computed: {
       //商品的编号
@@ -114,26 +110,26 @@
       },
       selectProductCateValue: function (newValue) {
         if (newValue != null && newValue.length === 2) {
-          this.value.productCategoryId = newValue[1];
-          this.value.productCategoryName = this.getCateNameById(this.value.productCategoryId);
+          this.value.bookCategoryId = newValue[1];
+          this.value.bookCategoryName = this.getCateNameById(this.value.bookCategoryId);
         } else {
-          this.value.productCategoryId = null;
-          this.value.productCategoryName = null;
+          this.value.bookCategoryId = null;
+          this.value.bookCategoryName = null;
         }
       }
     },
     methods: {
       //处理编辑逻辑
       handleEditCreated() {
-        if (this.value.productCategoryId != null) {
+        if (this.value.bookCategoryId != null) {
           this.selectProductCateValue.push(this.value.cateParentId);
-          this.selectProductCateValue.push(this.value.productCategoryId);
+          this.selectProductCateValue.push(this.value.bookCategoryId);
         }
         this.hasEditCreated = true;
       },
       getProductCateList() {
         fetchListWithChildren().then(response => {
-          let list = response.data;
+          let list = response.data.list;
           this.productCateOptions = [];
           for (let i = 0; i < list.length; i++) {
             let children = [];
@@ -167,10 +163,10 @@
         }
         return name;
       },
-      handleNext(formName) {
+      handleCommit(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$emit('nextStep');
+            this.$emit('finishCommit');
           } else {
             this.$message({
               message: '验证失败',

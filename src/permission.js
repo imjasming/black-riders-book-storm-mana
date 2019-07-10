@@ -5,6 +5,8 @@ import store from './store'
 import {getToken} from "@/utils/auth";
 import {Message} from "element-ui";
 
+import {adminMap, storeMap} from "@/config/routerMap";
+
 const whiteList = ['/login'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start()
@@ -16,6 +18,14 @@ router.beforeEach((to, from, next) => {
       const _store = store
       if (!_store.getters.roles || _store.getters.roles.length === 0 || ~_store.getters.userInfo || _store.getters.userInfo.length === 0) {
         store.dispatch('GetInfo').then(res => { // 拉取用户信息
+          if (!_store.getters.router) {
+            if (_store.getters.roles[0].code === 'admin') {
+              store.dispatch('setRouter', adminMap)
+            }
+            if (_store.getters.roles[0].code === 'store') {
+              store.dispatch('setRouter', storeMap)
+            }
+          }
           next()
         }).catch((err) => {
           store.dispatch('FedLogOut').then(() => {

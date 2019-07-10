@@ -1,44 +1,18 @@
 <template>
   <div class="app-container">
+    <el-row>
+      <el-card>
+        <div slot="header" class="clearfix">
+          <span>购书转化率</span>
+        </div>
+        <el-col :span="8">
+          <ve-pie :data="purchaseRate"></ve-pie>
+        </el-col>
+      </el-card>
+    </el-row>
     <div class="statistics-layout" v-for="item in lineChartModules">
       <div class="layout-title">{{item.title}}</div>
       <el-row>
-        <!--<el-col :span="4">
-          <div style="padding: 20px">
-            <div>
-              <div style="color: #909399;font-size: 14px">本月订单总数</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">10000</div>
-              <div>
-                <span class="color-success" style="font-size: 14px">+10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本周订单总数</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">1000</div>
-              <div>
-                <span class="color-danger" style="font-size: 14px">-10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本月销售总额</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">100000</div>
-              <div>
-                <span class="color-success" style="font-size: 14px">+10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上月</span>
-              </div>
-            </div>
-            <div style="margin-top: 20px;">
-              <div style="color: #909399;font-size: 14px">本周销售总额</div>
-              <div style="color: #606266;font-size: 24px;padding: 10px 0">50000</div>
-              <div>
-                <span class="color-danger" style="font-size: 14px">-10%</span>
-                <span style="color: #C0C4CC;font-size: 14px">同比上周</span>
-              </div>
-            </div>
-          </div>
-        </el-col>-->
         <el-col :span="20">
           <div style="padding: 10px;border-left:1px solid #DCDFE6">
             <el-date-picker
@@ -66,41 +40,10 @@
         </el-col>
       </el-row>
     </div>
-    <!--<div class="statistics-layout" >
-      <div class="layout-title">{{salesChart.title}}</div>
-      <el-row>
-        <el-col :span="20">
-          <div style="padding: 10px;border-left:1px solid #DCDFE6">
-            <el-date-picker
-              style="float: right;z-index: 1"
-              size="small"
-              v-model="orderCountDate"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              @change="handleDateChange"
-              :picker-options="pickerOptions">
-            </el-date-picker>
-            <div>
-              <ve-line
-                :data="salesChart.data"
-                :legend-visible="false"
-                :loading="salesChart.loading"
-
-                :settings="salesChart.settings"></ve-line>&lt;!&ndash;:data-empty="dataEmpty"&ndash;&gt;
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </div>-->
   </div>
 </template>
 
 <script>
-  import {str2Date} from '@/utils/date';
   import img_home_order from '@/assets/images/home_order.png';
   import img_home_today_amount from '@/assets/images/home_today_amount.png';
   import img_home_yesterday_amount from '@/assets/images/home_yesterday_amount.png';
@@ -158,7 +101,7 @@
         },
         orderCountDate: '',
         chartSettings: {
-          xAxisType: 'time',
+          xAxisType: 'value',
           area: true,
           axisSite: {right: ['orderAmount']},
           labelMap: {'orderCount': '订单数量', 'orderAmount': '订单金额'}
@@ -201,17 +144,34 @@
             rows: []
           },
           shownDataRows: []
+        },
+
+        purchaseRate: {
+          columns: ['name', 'rate'],
+          rows: [
+            {'name': '购书率', 'rate': 0},
+            {'name': '未购书', 'rate': 0}
+          ]
         }
       }
     },
     created() {
       this.initOrderCountDate();
-      this.getData();
-      this.loadSalesChart()
-      this.loadUserViews()
+      //this.loadSalesChart()
+      //this.loadUserViews()
       this.loadModulesChart()
+      this.loadPurchaseRate()
     },
     methods: {
+      loadPurchaseRate() {
+        request.get('/admin/purchaseRate').then(response => {
+          this.purchaseRate.rows[0].rate = response.data
+          this.purchaseRate.rows[1].rate = 1 - this.purchaseRate.rows[0].rate
+          this.purchaseRate.rows[0].name = `${this.purchaseRate.rows[0].name}-${response.data}`
+        }).catch(error => {
+          Message.error(`购书转化率拉取失败: ${error}`)
+        })
+      },
       handleDateChange() {
         this.getData();
       },
@@ -247,25 +207,6 @@
           Message.error(`用户访问数据加载失败：${error.error}`)
         })
       },
-      getData() {
-        setTimeout(() => {
-          this.chartData = {
-            columns: ['date', 'orderCount', 'orderAmount'],
-            rows: []
-          };
-          for (let i = 0; i < DATA_FROM_BACKEND.rows.length; i++) {
-            let item = DATA_FROM_BACKEND.rows[i];
-            let currDate = str2Date(item.date);
-            let start = this.orderCountDate[0];
-            let end = this.orderCountDate[1];
-            if (currDate.getTime() >= start.getTime() && currDate.getTime() <= end.getTime()) {
-              this.chartData.rows.push(item);
-            }
-          }
-          this.dataEmpty = false;
-          this.loading = false
-        }, 1000)
-      }
     }
   }
 </script>

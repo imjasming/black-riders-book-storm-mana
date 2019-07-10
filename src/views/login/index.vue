@@ -81,7 +81,8 @@
         loading: false,
         pwdType: 'password',
         login_center_bg,
-        dialogVisible: false
+        dialogVisible: false,
+
       }
     },
     methods: {
@@ -92,11 +93,13 @@
           this.pwdType = 'password'
         }
       },
+
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true;
             this.$store.dispatch('Login', this.loginForm).then(() => {
+
               this.loading = false;
               this.$router.push({path: '/'})
             }).catch(error => {

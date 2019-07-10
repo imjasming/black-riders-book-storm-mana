@@ -50,6 +50,7 @@
     },
     methods: {
       hasOneShowingChildren(children) {
+        let r = this.$router.options.routes
         const showingChildren = children.filter(item => {
           return !item.hidden
         })

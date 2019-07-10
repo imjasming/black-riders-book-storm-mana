@@ -1,4 +1,4 @@
-import {getInfo, login, logout} from '@/api/login'
+import {getInfo, login} from '@/api/login'
 import {getToken, removeToken, setToken} from '@/utils/auth'
 import {clearStore, getStore, setStore} from "@/utils/localStorage";
 import request from '@/utils/request'
@@ -99,14 +99,16 @@ const user = {
     // 登出
     LogOut({commit, state}) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
-          removeToken()
+        commit('SET_TOKEN', '')
+        commit('SET_ROLES', [])
+        removeToken()
+        clearStore()
+        resolve()
+        /*logout(state.token).then(() => {
           resolve()
         }).catch(error => {
           reject(error)
-        })
+        })*/
       })
     },
 

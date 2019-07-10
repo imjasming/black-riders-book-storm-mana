@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie'
+import {getStore, setStore} from "@/utils/localStorage";
 
 const app = {
   state: {
@@ -6,7 +7,8 @@ const app = {
       opened: !+Cookies.get('sidebarStatus'),
       withoutAnimation: false
     },
-    device: 'desktop'
+    device: 'desktop',
+    routers: getStore('routers')
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
@@ -24,9 +26,16 @@ const app = {
     },
     TOGGLE_DEVICE: (state, device) => {
       state.device = device
-    }
+    },
+    SET_ROUTERS: (state, routers) => {
+      state.device = routers
+      setStore('routers', routers)
+    },
   },
   actions: {
+    setRouter({commit}, router) {
+      commit('SET_ROUTERS', router)
+    },
     ToggleSideBar: ({commit}) => {
       commit('TOGGLE_SIDEBAR')
     },

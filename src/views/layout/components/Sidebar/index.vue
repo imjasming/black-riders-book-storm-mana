@@ -26,6 +26,8 @@
         'sidebar'
       ]),
       routes() {
+        /*let r = this.$store.getters.router
+        return r*/
         return this.$router.options.routes
       },
       isCollapse() {

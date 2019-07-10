@@ -56,7 +56,7 @@ export function updateNavStatus(data) {
 
 export function fetchListWithChildren() {
   return request({
-    url: '/productCategory/list/withChildren',
+    url: '/index/category',
     method: 'get'
   })
 }
