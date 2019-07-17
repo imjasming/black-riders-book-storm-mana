@@ -96,11 +96,11 @@
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
-            <el-button
+            <!--<el-button
               size="mini"
               @click="handleViewOrder(scope.$index, scope.row)"
             >查看订单
-            </el-button>
+            </el-button>-->
             <el-button
               size="mini"
               @click="handleCloseOrder(scope.$index, scope.row)"
@@ -318,7 +318,7 @@
     methods: {
       intervalLoadOrder() {
         this.getList()
-        setTimeout(this.intervalLoadOrder, 1000)
+        setTimeout(this.intervalLoadOrder, 2000)
       },
       initStoreInfo() {
         request.get(`/store/info?username=${this.$store.getters.name}`).then(response => {
@@ -461,7 +461,7 @@
           this.listLoading = false;
           this.$store.dispatch('setOrders', this.list)
         }).catch(error => {
-          Message.error(`数据加载失败：${error.error}`)
+          Message.error(`实时数据加载失败：${error.error}`)
         });
       }
       ,

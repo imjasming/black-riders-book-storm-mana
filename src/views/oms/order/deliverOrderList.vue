@@ -79,8 +79,12 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          const l = this.list[0]
+          let bookId = this.list[0].bookId
           let list = {
+            id: this.list[0].id,
             storeId: this.$store.getters.storeInfo.id,
+            bookId: bookId,
             orderId: this.list[0].orderId,
             shippingName: this.list[0].deliveryCompany,
             shippingCode: this.list[0].deliverySn,
@@ -91,13 +95,13 @@
               type: 'success',
               message: '发货成功!'
             });
+          }).catch(error => {
+            this.$message({
+              type: 'info',
+              message: '已取消发货'
+            });
           });
-        }).catch(error => {
-          this.$message({
-            type: 'info',
-            message: '已取消发货'
-          });
-        });
+        })
       }
     }
   }

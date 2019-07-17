@@ -37,12 +37,7 @@ export const constantRouterMap = [
     redirect: '/pms/product',
     name: 'pms',
     meta: {title: '商品', icon: 'product'},
-    children: [{
-      path: 'product',
-      name: 'product',
-      component: () => import('@/views/pms/product/index'),
-      meta: {title: '商品列表', icon: 'product-list'}
-    },
+    children: [
       {
         path: 'addProduct',
         name: 'addProduct',
@@ -165,13 +160,8 @@ export const constantRouterMap = [
         component: () => import('@/views/oms/order/deliverOrderList'),
         meta: {title: '发货列表'},
         hidden: true
-      },
-      {
-        path: 'orderSetting',
-        name: 'orderSetting',
-        component: () => import('@/views/oms/order/setting'),
-        meta: {title: '订单设置', icon: 'order-setting'}
-      }/*,
+      }
+      /*,
       {
         path: 'returnApply',
         name: 'returnApply',
